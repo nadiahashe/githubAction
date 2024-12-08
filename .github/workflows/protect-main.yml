@@ -1,19 +1,42 @@
-# this github action protected the main branch, allowing only 'develop' to be merged into it.
+# Name of workflow
+name: Lint and Test workflow
 
-name: protect_main
-
+# Trigger workflow on all pull requests
 on:
   pull_request:
     branches:
-      - main
+      - develop
+      - staging
 
+# Jobs to carry out
 jobs:
-  check_branch:
+  test:
+    # Operating system to run job on
     runs-on: ubuntu-latest
 
+    # Steps in job
     steps:
-      - name: branch check
-        if: github.head_ref != 'develop'
-        run: |
-          echo "Only develop can merge into main"
-          exit 1
+      # Get code from repo
+      - name: Checkout code
+        uses: actions/checkout@v1
+
+      - name: Use Node.js 21.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 21.x
+
+      # Install dependencies
+      - name: 🧰 Install Deps
+        run: npm install
+        
+      # Run lint
+      - name: Run Lint
+        run: npm run lint
+
+      # Run build
+      - name: Run Build
+        run: npm run build
+
+      # Run tests
+      - name: Run Tests
+        run: npm run test

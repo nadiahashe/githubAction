@@ -1,31 +1,39 @@
-# github action for deploying main branch on pull request
+# Name of the GitHub Actions workflow
+name: Deploy
 
-name: deploy-main
-
+# Trigger the workflow on push and pull request events to the main branch
 on:
   push:
     branches: [main]
   pull_request:
-    branches: 
+    branches:
       - main
 
 jobs:
-  CI:
+  # Define a job named "ci"
+  ci:
+    # Specify the operating system to run the job on
     runs-on: ubuntu-latest
-
+    
+    # Define the steps to be executed in the job
     steps:
-      - name: checkout
-      - uses: actions/checkout@v4
+      # Checkout the code from the repository
+      - uses: actions/checkout@v3
 
-# uncomment once we have tests to run
-      # - name: install and test
-      # - run: |
-      #     npm install
-      #     npm run test
+      # Define a step named "Test"
+      - name: Test
+        # Run install and test scripts
+        run: |
+            npm install
+            npm run test
 
-
-      - name: deploy
+      # Define a step named "Deploy"
+      - name: Deploy
+        # Only run this step if the branch is main
         if: github.ref == 'refs/heads/main'
+        # Set an environment variable with the deployment URL from secrets
         env:
-          DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL}}
-        run: curl "$DEPLOY_URL"
+          DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        # Run the deployment command
+        run: |
+          curl "$DEPLOY_URL"
